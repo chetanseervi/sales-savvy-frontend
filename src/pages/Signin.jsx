@@ -1,32 +1,37 @@
+// src/pages/Signin.jsx
+
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Signin() {
-  const [credentials, setCredentials] = useState({
-    username: "",
-    password: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setCredentials((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const data = { username, password };
     axios
-      .post("http://localhost:8080/signIn", credentials)
-      .then((response) => {
-        console.log("Login successful:", response.data);
-        alert("Sign in successful");
-        // Redirect or perform further actions here
+      .post("http://localhost:8080/signIn", data)
+      .then((res) => {
+        console.log("Sign in OK:", res.data);
+        // **STORE** the username for later
+        localStorage.setItem("username", username);
+
+        const role = res.data;
+        if (role === "admin") {
+          navigate("/admin_page");
+        } else if (role === "customer") {
+          navigate("/customer_page");
+        } else {
+          alert("Unknown role: " + role);
+        }
       })
-      .catch((error) => {
-        console.error("Login failed:", error);
-        alert("Invalid username or password");
+      .catch((err) => {
+        console.error("Signin failed:", err);
+        alert("Error signing in – check console");
       });
   };
 
@@ -36,22 +41,22 @@ export default function Signin() {
       <label>Username:</label>
       <input
         type="text"
-        name="username"
-        value={credentials.username}
-        onChange={handleChange}
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        required
       />
       <br />
       <br />
       <label>Password:</label>
       <input
         type="password"
-        name="password"
-        value={credentials.password}
-        onChange={handleChange}
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        required
       />
       <br />
       <br />
-      <button type="submit">Login</button>
+      <button type="submit">Sign In</button>
     </form>
   );
 }
