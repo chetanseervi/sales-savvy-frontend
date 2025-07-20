@@ -39,7 +39,7 @@ export default function Admin() {
         Add New Product
       </button>
 
-      <table border="1" cellPadding="5" style={{ marginTop: "1em" }}>
+      <table border="1">
         <thead>
           <tr>
             <th>Image</th>
